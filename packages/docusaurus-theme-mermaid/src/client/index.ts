@@ -8,6 +8,7 @@
 import {useState, useEffect, useMemo} from 'react';
 import {useColorMode, useThemeConfig} from '@docusaurus/theme-common';
 import mermaid from 'mermaid';
+import elkLayouts from '@mermaid-js/layout-elk';
 import type {RenderResult, MermaidConfig} from 'mermaid';
 import type {ThemeConfig} from '@docusaurus/theme-mermaid';
 
@@ -53,6 +54,8 @@ async function renderMermaid({
   text: string;
   config: MermaidConfig;
 }): Promise<RenderResult> {
+  // ELK layouts should be registered before initialize(config)
+  mermaid.registerLayoutLoaders(elkLayouts);
   /*
   Mermaid API is really weird :s
   It is a big mutable singleton with multiple config levels
