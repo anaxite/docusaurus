@@ -288,7 +288,7 @@ export function getVersionFromSourceFilePath(
 ): VersionMetadata {
   const versionFound = versionsMetadata.find((version) =>
     getContentPathList(version).some((docsDirPath) =>
-      filePath.startsWith(docsDirPath),
+      isPathInsideDir(filePath, docsDirPath),
     ),
   );
   if (!versionFound) {
@@ -297,4 +297,20 @@ export function getVersionFromSourceFilePath(
     );
   }
   return versionFound;
+}
+
+/**
+ * Checks whether `filePath` is inside `dirPath` using proper path-boundary
+ * awareness, unlike a plain `String.startsWith` check which can misclassify
+ * paths that share a common string prefix but are not in a parent-child
+ * relationship (e.g. `docs-foo` vs `docs-foo_versioned_docs`).
+ */
+function isPathInsideDir(filePath: string, dirPath: string): boolean {
+  const relative = path.relative(dirPath, filePath);
+  return (
+    relative === '' ||
+    (!path.isAbsolute(relative) &&
+      relative !== '..' &&
+      !relative.startsWith(`..${path.sep}`))
+  );
 }
